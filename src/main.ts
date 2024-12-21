@@ -1,7 +1,8 @@
+import * as Y from "yjs";
+import { WebrtcProvider } from "y-webrtc";
+import { QuillBinding } from "y-quill";
 import Quill from "quill";
 import QuillCursors from "quill-cursors";
-import * as Y from "yjs";
-import { QuillBinding } from "y-quill";
 
 Quill.register("modules/cursors", QuillCursors);
 
@@ -26,9 +27,16 @@ const quill = new Quill(document.querySelector("#editor") as HTMLElement, {
 
 // A Yjs document holds the shared data
 const ydoc = new Y.Doc();
+
+const provider = new WebrtcProvider("quill-demo-room", ydoc);
+
 // Define a shared text type on the document
 const ytext = ydoc.getText("quill");
 
-// Create an editor-binding which
-// "binds" the quill editor to a Y.Text type.
-const binding = new QuillBinding(ytext, quill);
+// "Bind" the quill editor to a Yjs text type.
+const binding = new QuillBinding(ytext, quill, provider.awareness);
+
+// Remove the selection when the iframe is blurred
+window.addEventListener("blur", () => {
+  quill.blur();
+});
